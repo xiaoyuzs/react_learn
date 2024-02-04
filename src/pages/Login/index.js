@@ -4,15 +4,19 @@ import logo from '@/assets/logo.png'
 import { useDispatch } from 'react-redux'
 import { fetchLogin } from '@/store/modules/user'
 import { useNavigate } from 'react-router-dom'
+import { fetchUserInfo } from '@/store/modules/user'
+
 
 const Login = () => {
     const dispatch = useDispatch()
     const navgate = useNavigate()
     const onFinish = async (values) => {
         await dispatch(fetchLogin(values))
-        navgate('/')
-        message.success('登录成功')
-    }
+        //登录成功时调用fetchUserInfo函数
+        await dispatch(fetchUserInfo())
+        navgate("/");
+        message.success("登录成功");
+    };
     return (
         <div className="login">
             <Card className="login-container">

@@ -7,6 +7,7 @@ import {
 } from '@ant-design/icons'
 import './index.scss'
 import { Outlet, useLocation, useNavigate } from 'react-router-dom'
+import { getUserInfo } from '@/utils'
 
 const { Header, Sider } = Layout
 
@@ -37,12 +38,15 @@ const GeekLayout = () => {
     // 反向高亮
     const location = useLocation()
     const selectedkey = location.pathname
+    // 获取用户信息
+    const userInfo = getUserInfo();
+    const username = userInfo ? userInfo.name : '';
     return (
         <Layout>
             <Header className="header">
                 <div className="logo" />
                 <div className="user-info">
-                    <span className="user-name">柴柴老师</span>
+                    <span className="user-name">{username}</span>
                     <span className="user-logout">
                         <Popconfirm title="是否确认退出？" okText="退出" cancelText="取消">
                             <LogoutOutlined /> 退出
