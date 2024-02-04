@@ -8,8 +8,8 @@ import { useNavigate } from 'react-router-dom'
 const Login = () => {
     const dispatch = useDispatch()
     const navgate = useNavigate()
-    const onFinish = (values) => {
-        dispatch(fetchLogin(values))
+    const onFinish = async (values) => {
+        await dispatch(fetchLogin(values))
         navgate('/')
         message.success('登录成功')
     }
