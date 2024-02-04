@@ -1,3 +1,4 @@
+import { useDispatch} from 'react-redux'
 import { Layout, Menu, Popconfirm } from 'antd'
 import {
     HomeOutlined,
@@ -8,6 +9,7 @@ import {
 import './index.scss'
 import { Outlet, useLocation, useNavigate } from 'react-router-dom'
 import { getUserInfo } from '@/utils'
+import { clearUserInfo } from '@/store/modules/user'
 
 const { Header, Sider } = Layout
 
@@ -30,17 +32,26 @@ const items = [
 ]
 
 const GeekLayout = () => {
+    const dispatch = useDispatch()
     const navigate = useNavigate()
     const onMenuClick = (route) => {
         const path = route.key;
         navigate(path)
     }
+
     // 反向高亮
     const location = useLocation()
     const selectedkey = location.pathname
+
     // 获取用户信息
     const userInfo = getUserInfo();
     const username = userInfo ? userInfo.name : '';
+
+    //退出登录确认回调
+    const onConfirm = () => {
+        dispatch(clearUserInfo())
+        navigate('/login')
+    }
     return (
         <Layout>
             <Header className="header">
@@ -48,7 +59,7 @@ const GeekLayout = () => {
                 <div className="user-info">
                     <span className="user-name">{username}</span>
                     <span className="user-logout">
-                        <Popconfirm title="是否确认退出？" okText="退出" cancelText="取消">
+                        <Popconfirm title="是否确认退出？" okText="退出" cancelText="取消" onConfirm={onConfirm}>
                             <LogoutOutlined /> 退出
                         </Popconfirm>
                     </span>
