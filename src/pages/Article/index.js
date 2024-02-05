@@ -1,12 +1,13 @@
-import { Link,useNavigate } from 'react-router-dom'
-import { Card, Breadcrumb, Form, Button, Radio, DatePicker, Select,Popconfirm } from 'antd'
+import { Link, useNavigate } from 'react-router-dom'
+import { Card, Breadcrumb, Form, Button, Radio, DatePicker, Select, Popconfirm, Pagination } from 'antd'
 import locale from 'antd/es/date-picker/locale/zh_CN'
 import { Table, Tag, Space } from 'antd'
 import { EditOutlined, DeleteOutlined } from '@ant-design/icons'
 import { useChannel } from '@/hooks/useChannel'
 import img404 from '@/assets/error.png'
-import { getArticleListAPI,delArticleAPI } from '@/apis/article'
+import { getArticleListAPI, delArticleAPI } from '@/apis/article'
 import { useEffect, useState } from 'react'
+import './index.scss'
 
 
 
@@ -61,22 +62,22 @@ const Article = () => {
             render: data => {
                 return (
                     <Space size="middle">
-                        <Button type="primary" shape="circle" icon={<EditOutlined />} onClick={()=> navigate(`/publish?id=${data.id}`)}/>
+                        <Button type="primary" shape="circle" icon={<EditOutlined />} onClick={() => navigate(`/publish?id=${data.id}`)} />
                         <Popconfirm
                             title="删除"
                             description="确定要删除吗"
-                            onConfirm={()=>onConfirm(data)}
+                            onConfirm={() => onConfirm(data)}
                             okText="Yes"
                             cancelText="No"
                         >
                             <Button
-                            type="primary"
-                            danger
-                            shape="circle"
-                            icon={<DeleteOutlined />}
-                        />
+                                type="primary"
+                                danger
+                                shape="circle"
+                                icon={<DeleteOutlined />}
+                            />
                         </Popconfirm>
-                        
+
                     </Space>
                 )
             }
@@ -183,12 +184,14 @@ const Article = () => {
             </Card>
             {/* 准备表格区域 */}
             <Card title={`根据筛选条件共查询到 ${count} 条结果：`}>
-                <Table rowKey="id" columns={columns} dataSource={list} pagination={{
-                    total: count,
-                    pageSize: reqData.per_page,
-                    onChange: onPageChange
-                }} />
+                <Table rowKey="id" columns={columns} dataSource={list} pagination={false} />
+                <Pagination
+                    total={count}
+                    pageSize={reqData.per_page}
+                    onChange={onPageChange}
+                />
             </Card>
+
         </div>
     )
 }

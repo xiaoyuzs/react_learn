@@ -8,7 +8,7 @@ import {
     Upload,
     Space,
     Select,
-    message
+    message,
 } from 'antd'
 import { PlusOutlined } from '@ant-design/icons'
 import { Link,useSearchParams } from 'react-router-dom'
@@ -71,9 +71,24 @@ const Publish = () => {
         // 1.通过id获取数据
         async function getArticleDetail() {
             const res = await getArticleById(articleId)
-            form.setFieldsValue(res.data)
+            const data = res.data;
+            const {cover} = data
+            form.setFieldsValue({
+                ...data,
+                type:cover.type
+            })
+
+            //回填图片列表
+            setImageList(cover.type)
+            //显示图片({url:url})
+            setImageList(cover.images.map(url=> {
+                return {url}
+            }))
         }
-        getArticleDetail()
+        // 只有有id的时候才能调用此函数回填
+        if(articleId) {
+            getArticleDetail()
+        }
         //2.调用实例方法，完成回填
     },[articleId,form])
 
@@ -83,7 +98,7 @@ const Publish = () => {
                 title={
                     <Breadcrumb items={[
                         { title: <Link to={'/'}>首页</Link> },
-                        { title: '发布文章' },
+                        { title: `${articleId ? '编辑' : '发布'} 文章` },
                     ]} />}>
                 <Form
                     labelCol={{ span: 4 }}
