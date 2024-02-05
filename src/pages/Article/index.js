@@ -15,6 +15,10 @@ const { RangePicker } = DatePicker
 
 const Article = () => {
     const channelList = useChannel()
+    const status = {
+        1: <Tag color="warning">待审核</Tag>,
+        2: <Tag color='success'>审核通过</Tag>
+    }
     const columns = [
         {
             title: '封面',
@@ -32,7 +36,7 @@ const Article = () => {
         {
             title: '状态',
             dataIndex: 'status',
-            render: data => data === 1 ? <Tag color='warning'>待审核</Tag> : <Tag color='success'>审核通过</Tag>
+            render: data => status[data]
         },
         {
             title: '发布时间',
@@ -81,10 +85,20 @@ const Article = () => {
             status: 2,
             title: 'wkwebview离线化加载h5资源解决方案'
         }]
+    //筛选功能
+    // 1. 准备参数
+    const [reqData, setReqData] = useState({
+        status: '',
+        channel_id: '',
+        begin_pubdate: '',
+        end_pubdate: '',
+        page: 1,
+        per_page: 4
+    })
 
     //获取文章列表
     const [list, setList] = useState([])
-    const [count,setcount] = useState(0)
+    const [count, setcount] = useState(0)
     useEffect(() => {
         async function getList() {
             const res = await getArticleListAPI()
@@ -95,6 +109,22 @@ const Article = () => {
         getList()
     }, [])
 
+
+
+    // 2. 获取筛选数据
+    const onFinish = (formValue) => {
+        console.log(formValue);
+        // 3. 把表单收集到数据放到参数中(不可变的方式)
+        setReqData({
+            ...reqData,
+            channel_id: formValue.channel_id,
+            status: formValue.status,
+            begin_pubdate: formValue.date[0].format('YYYY-MM-DD'),
+            end_pubdate: formValue.date[1].format('YYYY-MM-DD')
+        })
+        // 4. 重新拉去文章列表 + 渲染table逻辑
+        // reqData依赖项发生变化 重复执行副作用函数
+    }
     return (
         <div>
             <Card
@@ -106,7 +136,7 @@ const Article = () => {
                 }
                 style={{ marginBottom: 20 }}
             >
-                <Form initialValues={{ status: '' }}>
+                <Form initialValues={{ status: '' }} onFinish={onFinish}>
                     <Form.Item label="状态" name="status">
                         <Radio.Group>
                             <Radio value={''}>全部</Radio>
