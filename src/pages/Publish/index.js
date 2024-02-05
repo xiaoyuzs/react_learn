@@ -15,29 +15,21 @@ import { Link } from 'react-router-dom'
 import './index.scss'
 import ReactQuill from 'react-quill'
 import 'react-quill/dist/quill.snow.css'
-import { useState, useEffect } from 'react'
-import { createArticleAPI, getChannelAPI } from '@/apis/article'
+import { useState } from 'react'
+import { createArticleAPI } from '@/apis/article'
+import { useChannel } from '@/hooks/useChannel'
 
 const { Option } = Select
 
 const Publish = () => {
 
     // 获取频道列表
-    const [channelList, setChannelList] = useState([])
-    useEffect(() => {
-        // 1.封装函数 在函数体内调用接口
-        const getChannelList = async () => {
-            const res = await getChannelAPI()
-            setChannelList(res.data.channels)
-        }
-        //调用函数
-        getChannelList()
-    }, [])
+    const channelList = useChannel()
 
     // 提交表单
     const onFinish = (formvalue) => {
         // 校验封面类型imageType是否和实际的图片列表imageList数量时相等的
-        if(imageList.length !== imageType) return message.warning('封面类型和图片数量不匹配')
+        if (imageList.length !== imageType) return message.warning('封面类型和图片数量不匹配')
         const { title, content, channel_id } = formvalue;
         // 1. 按照接口文档的格式处理收集到的表达数据
         const reqData = {
@@ -46,9 +38,9 @@ const Publish = () => {
             cover: {
                 type: imageType,
                 images: imageList.map(item => {
-                    if(item.response) {
+                    if (item.response) {
                         return item.response.data.url
-                    }else {
+                    } else {
                         return item.url
                     }
                 })
@@ -76,7 +68,7 @@ const Publish = () => {
                     <Breadcrumb items={[
                         { title: <Link to={'/'}>首页</Link> },
                         { title: '发布文章' },
-                    ]}/>}>
+                    ]} />}>
                 <Form
                     labelCol={{ span: 4 }}
                     wrapperCol={{ span: 16 }}
