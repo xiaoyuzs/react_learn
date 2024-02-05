@@ -7,7 +7,8 @@ import {
     Input,
     Upload,
     Space,
-    Select
+    Select,
+    message
 } from 'antd'
 import { PlusOutlined } from '@ant-design/icons'
 import { Link } from 'react-router-dom'
@@ -35,14 +36,22 @@ const Publish = () => {
 
     // 提交表单
     const onFinish = (formvalue) => {
+        // 校验封面类型imageType是否和实际的图片列表imageList数量时相等的
+        if(imageList.length !== imageType) return message.warning('封面类型和图片数量不匹配')
         const { title, content, channel_id } = formvalue;
         // 1. 按照接口文档的格式处理收集到的表达数据
         const reqData = {
             title,
             content,
             cover: {
-                type: 0,
-                images: []
+                type: imageType,
+                images: imageList.map(item => {
+                    if(item.response) {
+                        return item.response.data.url
+                    }else {
+                        return item.url
+                    }
+                })
             },
             channel_id
         }
@@ -51,15 +60,13 @@ const Publish = () => {
     }
 
     //上传回调
-    const [imageList,setImageList] = useState([])
+    const [imageList, setImageList] = useState([])
     const onChange = (value) => {
-        console.log('文件上传中',value);
         setImageList(value.fileList)
     }
     //切换图片封面类型
-    const [imageType,setImageType] = useState(0)
+    const [imageType, setImageType] = useState(0)
     const onTypeChange = (e) => {
-        console.log('封面改变了',e.target.value);
         setImageType(e.target.value)
     }
     return (
@@ -69,28 +76,22 @@ const Publish = () => {
                     <Breadcrumb items={[
                         { title: <Link to={'/'}>首页</Link> },
                         { title: '发布文章' },
-                    ]}
-                    />
-                }
-            >
+                    ]}/>}>
                 <Form
                     labelCol={{ span: 4 }}
                     wrapperCol={{ span: 16 }}
                     initialValues={{ type: 0 }}
-                    onFinish={onFinish}
-                >
+                    onFinish={onFinish}>
                     <Form.Item
                         label="标题"
                         name="title"
-                        rules={[{ required: true, message: '请输入文章标题' }]}
-                    >
+                        rules={[{ required: true, message: '请输入文章标题' }]} >
                         <Input placeholder="请输入文章标题" style={{ width: 400 }} />
                     </Form.Item>
                     <Form.Item
                         label="频道"
                         name="channel_id"
-                        rules={[{ required: true, message: '请选择文章频道' }]}
-                    >
+                        rules={[{ required: true, message: '请选择文章频道' }]} >
                         <Select placeholder="请选择文章频道" style={{ width: 400 }}>
                             {/* value属性用户选中之后会自动收集起来作为接口的提交字段 */}
                             {channelList.map(item => <Option key={item.id} value={item.id}>{item.name}</Option>)}
@@ -108,7 +109,7 @@ const Publish = () => {
                         listType: 决定选择文件框的外观样式
                         showUploadList: 控制显示上传列表
                         */}
-                        {imageType>0 && <Upload
+                        {imageType > 0 && <Upload
                             listType="picture-card"
                             showUploadList
                             action={'http://geek.itheima.net/v1_0/upload'}
