@@ -1,4 +1,4 @@
-import { useDispatch} from 'react-redux'
+import { useDispatch } from 'react-redux'
 import { Layout, Menu, Popconfirm } from 'antd'
 import {
     HomeOutlined,
@@ -7,9 +7,11 @@ import {
     LogoutOutlined,
 } from '@ant-design/icons'
 import './index.scss'
-import { Outlet, useLocation, useNavigate } from 'react-router-dom'
+import { Outlet, useNavigate,useLocation } from 'react-router-dom'
 import { getUserInfo } from '@/utils'
 import { clearUserInfo } from '@/store/modules/user'
+
+
 
 const { Header, Sider } = Layout
 
@@ -39,10 +41,6 @@ const GeekLayout = () => {
         navigate(path)
     }
 
-    // 反向高亮
-    const location = useLocation()
-    const selectedkey = location.pathname
-
     // 获取用户信息
     const userInfo = getUserInfo();
     const username = userInfo ? userInfo.name : '';
@@ -52,6 +50,11 @@ const GeekLayout = () => {
         dispatch(clearUserInfo())
         navigate('/login')
     }
+    // 高亮
+    // 1. 获取当前路由路径
+    const location = useLocation()
+    console.log(location.pathname)
+    const selectedkey = location.pathname
     return (
         <Layout>
             <Header className="header">
@@ -70,15 +73,16 @@ const GeekLayout = () => {
                     <Menu
                         mode="inline"
                         theme="dark"
-                        defaultSelectedKeys={['1']}
-                        items={items}
+                        defaultSelectedKeys={['/home']}
                         selectedKeys={selectedkey}
+                        items={items}
                         onClick={onMenuClick}
-                        style={{ height: '100%', borderRight: 0 }}></Menu>
+                        style={{ height: '100%', borderRight: 0 }}>
+                    </Menu>
                 </Sider>
                 <Layout className="layout-content" style={{ padding: 20 }}>
                     {/* 二级路由出口 */}
-                    <Outlet/>
+                    <Outlet />
                 </Layout>
             </Layout>
         </Layout>
