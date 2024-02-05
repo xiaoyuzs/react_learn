@@ -1,12 +1,13 @@
-import { Link } from 'react-router-dom'
-import { Card, Breadcrumb, Form, Button, Radio, DatePicker, Select } from 'antd'
+import { Link,useNavigate } from 'react-router-dom'
+import { Card, Breadcrumb, Form, Button, Radio, DatePicker, Select,Popconfirm } from 'antd'
 import locale from 'antd/es/date-picker/locale/zh_CN'
 import { Table, Tag, Space } from 'antd'
 import { EditOutlined, DeleteOutlined } from '@ant-design/icons'
 import { useChannel } from '@/hooks/useChannel'
 import img404 from '@/assets/error.png'
-import { getArticleListAPI } from '@/apis/article'
+import { getArticleListAPI,delArticleAPI } from '@/apis/article'
 import { useEffect, useState } from 'react'
+
 
 
 const { Option } = Select
@@ -14,6 +15,7 @@ const { RangePicker } = DatePicker
 
 
 const Article = () => {
+    const navigate = useNavigate()
     const channelList = useChannel()
     const status = {
         1: <Tag color="warning">待审核</Tag>,
@@ -59,32 +61,28 @@ const Article = () => {
             render: data => {
                 return (
                     <Space size="middle">
-                        <Button type="primary" shape="circle" icon={<EditOutlined />} />
-                        <Button
+                        <Button type="primary" shape="circle" icon={<EditOutlined />} onClick={()=> navigate(`/publish?id=${data.id}`)}/>
+                        <Popconfirm
+                            title="删除"
+                            description="确定要删除吗"
+                            onConfirm={()=>onConfirm(data)}
+                            okText="Yes"
+                            cancelText="No"
+                        >
+                            <Button
                             type="primary"
                             danger
                             shape="circle"
                             icon={<DeleteOutlined />}
                         />
+                        </Popconfirm>
+                        
                     </Space>
                 )
             }
         }
     ]
-    // 准备表格body数据
-    const data = [
-        {
-            id: '8218',
-            comment_count: 0,
-            cover: {
-                images: [],
-            },
-            like_count: 0,
-            pubdate: '2019-03-11 09:00:00',
-            read_count: 2,
-            status: 2,
-            title: 'wkwebview离线化加载h5资源解决方案'
-        }]
+
     //筛选功能
     // 1. 准备参数
     const [reqData, setReqData] = useState({
@@ -132,6 +130,14 @@ const Article = () => {
         setReqData({
             ...reqData,
             page
+        })
+    }
+
+    //4. 删除功能
+    const onConfirm = async (data) => {
+        await delArticleAPI(data.id)
+        setReqData({
+            ...reqData
         })
     }
     return (
