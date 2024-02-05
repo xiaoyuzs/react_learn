@@ -28,6 +28,15 @@ export function getArticleListAPI(params) {
     })
 }
 
+// 更新文章表单
+
+export function updateArticleAPI(data) {
+    return request({
+        url : `/mp/articles/${data.id}?draft=false`,
+        method:'PUT',
+        data
+    })
+}
 //4.删除文章
 export function delArticleAPI(id) {
     return request({

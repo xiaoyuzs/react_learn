@@ -11,14 +11,14 @@ import {
     message,
 } from 'antd'
 import { PlusOutlined } from '@ant-design/icons'
-import { Link,useSearchParams } from 'react-router-dom'
+import { Link, useSearchParams } from 'react-router-dom'
 import './index.scss'
 import ReactQuill from 'react-quill'
 import 'react-quill/dist/quill.snow.css'
-import { useState,useEffect } from 'react'
+import { useState, useEffect } from 'react'
 import { createArticleAPI } from '@/apis/article'
 import { useChannel } from '@/hooks/useChannel'
-import { getArticleById } from '@/apis/article'
+import { getArticleById, updateArticleAPI } from '@/apis/article'
 
 const { Option } = Select
 
@@ -38,6 +38,8 @@ const Publish = () => {
             content,
             cover: {
                 type: imageType,
+                // 这里的url处理逻辑只是在新增的时候的逻辑
+                // 编辑的时候需要做处理
                 images: imageList.map(item => {
                     if (item.response) {
                         return item.response.data.url
@@ -48,8 +50,14 @@ const Publish = () => {
             },
             channel_id
         }
-        //调用接口提交
-        createArticleAPI(reqData)
+        //2.调用接口提交
+        // 处理调用不同的接口 新增 - 新增接口 编辑状态 - 更新接口 id
+        if (articleId) {
+            //更新接口
+            updateArticleAPI({ ...reqData, id: articleId })
+        } else {
+            createArticleAPI(reqData)
+        }
     }
 
     //上传回调
@@ -67,30 +75,30 @@ const Publish = () => {
     const [form] = Form.useForm()
     const [searchParams] = useSearchParams()
     const articleId = searchParams.get('id')
-    useEffect(()=> {
+    useEffect(() => {
         // 1.通过id获取数据
         async function getArticleDetail() {
             const res = await getArticleById(articleId)
             const data = res.data;
-            const {cover} = data
+            const { cover } = data
             form.setFieldsValue({
                 ...data,
-                type:cover.type
+                type: cover.type
             })
 
             //回填图片列表
             setImageList(cover.type)
             //显示图片({url:url})
-            setImageList(cover.images.map(url=> {
-                return {url}
+            setImageList(cover.images.map(url => {
+                return { url }
             }))
         }
         // 只有有id的时候才能调用此函数回填
-        if(articleId) {
+        if (articleId) {
             getArticleDetail()
         }
         //2.调用实例方法，完成回填
-    },[articleId,form])
+    }, [articleId, form])
 
     return (
         <div className="publish">
@@ -106,8 +114,8 @@ const Publish = () => {
                     initialValues={{ type: 0 }}
                     onFinish={onFinish}
                     form={form}
-                    >
-                    
+                >
+
                     <Form.Item
                         label="标题"
                         name="title"
